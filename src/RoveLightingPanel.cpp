@@ -12,6 +12,10 @@ void RoveLightingPanel::begin() {
     m_neoPixel.setBrightness(m_maxBrightness);
 }
 
+void RoveLightingPanel::show() {
+    m_neoPixel.show();
+}
+
 void RoveLightingPanel::fill(Color color) {
     m_neoPixel.fill(Adafruit_NeoPixel::Color(color.r, color.g, color.b));
 }
@@ -20,37 +24,41 @@ void RoveLightingPanel::clear() {
     m_neoPixel.clear();
 }
 
-uint32_t RoveLightingPanel::getPixelID(int32_t x, int32_t y) const {
+int32_t RoveLightingPanel::getPixelID(int32_t x, int32_t y) const {
     // Check if out of bounds
     if (x < 0 || x >= m_width || y < 0 || y >= m_height) return -1;
+    
     // Flip coordinates before calculation to account for orientation
-    switch (m_orientation) {
-        // Normal x
-        case LightingPanelOrientation::TOP_LEFT:
-            if (y % 2 == 0) x = m_width - x - 1;
-            break;
-        // Flip x
-        case LightingPanelOrientation::TOP_RIGHT:
-            if (y % 2 == 1) x = m_width - x - 1;
-            break;
-        // Normal x, Flip y
-        case LightingPanelOrientation::BOTTOM_LEFT:
-            if (y % 2 == 0) x = m_width - x - 1;
-            y = m_height - y - 1;
-            break;
-        // Flip x and y
-        case LightingPanelOrientation::BOTTOM_RIGHT:
-            if (y % 2 == 1) x = m_width - x - 1;
-            y = m_height - y - 1;
-            break;
+    uint16_t width = m_width;
+    uint16_t height = m_height;
+
+    if (m_orientation & ORIENTATION_IS_INVERTED) {
+        // Swap X and Y
+        int32_t temp = x;
+        x = y;
+        y = temp;
+        // Swap width and height
+        width = m_height;
+        height = m_width;
+    }
+    
+    if (m_orientation & ORIENTATION_IS_FLIPPED_Y) {
+        y = height - y - 1;
     }
 
-    uint32_t pixelID = y * m_height + x;
+    if (m_orientation & ORIENTATION_IS_FLIPPED_X) {
+        if (y % 2 == 0) x = width - x - 1;
+    } else {
+        // Because of the zig-zag pattern, X gets flipped on odd rows under normal operation
+        if (y % 2 == 1) x = width - x - 1;
+    }
+
+    int32_t pixelID = y * width + x;
 
     // Correct for skipping over dead pixels
     for (int i = 0; i < m_deadPixelCount; i++) {
-        if (m_deadPixels[i] == pixelID) return; // Do not attempt to set this pixel
-        if (m_deadPixels[i] < pixelID) --pixelID; // Pixel will be reached earlier than expected.
+        if (m_deadPixels[i] == pixelID) return -1; // Do not attempt to set this pixel
+        if (m_deadPixels[i] < pixelID) --pixelID; // Pixel will be reached earlier than expected
     }
 
     return pixelID;
@@ -71,7 +79,9 @@ void RoveLightingPanel::setPixelGrayscale(int32_t x, int32_t y, uint8_t value) {
     m_neoPixel.setPixelColor(pixelID, value, value, value);
 }
 
-void RoveLightingPanel::configOrientation(LightingPanelOrientation orientation) { m_orientation = orientation; }
+void RoveLightingPanel::configOrientation(LightingPanelOrientation orientation) {
+    m_orientation = orientation;
+}
 
 void RoveLightingPanel::configMaxBrightness(uint8_t brightness) {
     m_maxBrightness = brightness;

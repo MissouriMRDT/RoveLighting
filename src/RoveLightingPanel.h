@@ -8,15 +8,26 @@
 
 #define MAX_DEAD_PIXELS 32
 
+// Indicates that X should be flipped before rendering
+#define ORIENTATION_IS_FLIPPED_X (1 << 0)
+// Indicates that Y should be flipped before rendering
+#define ORIENTATION_IS_FLIPPED_Y (1 << 1)
+// Indicates X and Y should be swapped before rendering
+#define ORIENTATION_IS_INVERTED (1 << 2)
+
 /**
- * @brief Describes the location of the zeroth pixel on the panel
- * 
+ * @brief Describes the location of the zeroth pixel on the panel and the direction of winding.
+ * To determine which value to use, look at the LED array for an arrow in the corner that indicates the direction
  */
-enum class LightingPanelOrientation {
-    TOP_LEFT,
-    TOP_RIGHT,
-    BOTTOM_LEFT,
-    BOTTOM_RIGHT,
+enum LightingPanelOrientation {
+    TOP_LEFT_THEN_RIGHT     = 0,
+    TOP_RIGHT_THEN_LEFT     = ORIENTATION_IS_FLIPPED_X,
+    BOTTOM_LEFT_THEN_RIGHT  = ORIENTATION_IS_FLIPPED_Y,
+    BOTTOM_RIGHT_THEN_LEFT  = ORIENTATION_IS_FLIPPED_X | ORIENTATION_IS_FLIPPED_Y,
+    TOP_LEFT_THEN_DOWN      = ORIENTATION_IS_INVERTED,
+    BOTTOM_LEFT_THEN_UP     = ORIENTATION_IS_INVERTED | ORIENTATION_IS_FLIPPED_X,
+    TOP_RIGHT_THEN_DOWN     = ORIENTATION_IS_INVERTED | ORIENTATION_IS_FLIPPED_Y,
+    BOTTOM_RIGHT_THEN_UP    = ORIENTATION_IS_INVERTED | ORIENTATION_IS_FLIPPED_X | ORIENTATION_IS_FLIPPED_Y,
 };
 
 class RoveLightingPanel : public RoveCanvas {
@@ -31,7 +42,7 @@ private:
     uint8_t m_deadPixelCount = 0;
     uint32_t m_deadPixels[MAX_DEAD_PIXELS] = {0};
 
-    LightingPanelOrientation m_orientation = LightingPanelOrientation::TOP_LEFT;
+    LightingPanelOrientation m_orientation = LightingPanelOrientation::TOP_LEFT_THEN_RIGHT;
 
 public:
     /**
@@ -44,8 +55,9 @@ public:
     RoveLightingPanel(uint8_t pin, uint16_t width, uint16_t height, neoPixelType type = NEO_GRB + NEO_KHZ800);
 
     void begin();
+    void show();
 
-    uint32_t getPixelID(int32_t x, int32_t y) const;
+    int32_t getPixelID(int32_t x, int32_t y) const;
 
     void fill(Color color) override;
     void clear() override;
