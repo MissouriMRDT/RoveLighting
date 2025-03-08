@@ -1,43 +1,73 @@
 #include "RovePanelMap.h"
 
 RovePanelMap::RovePanelMap() {
-    for (int i = 0; i < MAX_LIGHTING_PANELS; i++) {
-        m_panels[i].panel = nullptr;
+    // nothing to do yet
+}
+
+void RovePanelMap::begin() {
+    PanelDescriptor *begin = m_panels, *end = m_panels + m_panelCount;
+    for (PanelDescriptor *it = begin; it < end; ++it) {
+        if (it->panel) {
+            it->panel->begin();
+        }
+    }
+}
+
+void RovePanelMap::addPanel(int32_t x, int32_t y, RoveLightingPanel *panel) {
+    if (m_panelCount < MAX_LIGHTING_PANELS) {
+        PanelDescriptor &desc = m_panels[m_panelCount++];
+        desc.x = x;
+        desc.y = y;
+        desc.panel = panel;
+        desc.modified = true;
+    }
+}
+
+void RovePanelMap::show() {
+    PanelDescriptor *begin = m_panels, *end = m_panels + m_panelCount;
+    for (PanelDescriptor *it = begin; it < end; ++it) {
+        if (it->modified) {
+            it->panel->show();
+        }
     }
 }
 
 void RovePanelMap::fill(Color color) {
-    for (PanelDescriptor &desc : m_panels) {
-        if (desc.panel) {
-            desc.panel->fill(color);
+    PanelDescriptor *begin = m_panels, *end = m_panels + m_panelCount;
+    for (PanelDescriptor *it = begin; it < end; ++it) {
+        if (it->panel) {
+            it->panel->fill(color);
         }
     }
 }
 
 void RovePanelMap::clear() {
-    for (PanelDescriptor &desc : m_panels) {
-        if (desc.panel) {
-            desc.panel->clear();
+    PanelDescriptor *begin = m_panels, *end = m_panels + m_panelCount;
+    for (PanelDescriptor *it = begin; it < end; ++it) {
+        if (it->panel) {
+            it->panel->clear();
         }
     }
 }
 
 void RovePanelMap::setPixelRGB(int32_t x, int32_t y, Color color) {
-    for (PanelDescriptor &desc : m_panels) {
-        if (isInBounds(x, y, desc)) {
-            int32_t panelX = x - desc.x;
-            int32_t panelY = y - desc.y;
-            desc.panel->setPixelRGB(panelX, panelY, color);
+    PanelDescriptor *begin = m_panels, *end = m_panels + m_panelCount;
+    for (PanelDescriptor *it = begin; it < end; ++it) {
+        if (isInBounds(x, y, *it)) {
+            int32_t panelX = x - it->x;
+            int32_t panelY = y - it->y;
+            it->panel->setPixelRGB(panelX, panelY, color);
         }
     }
 }
 
 void RovePanelMap::setPixelGrayscale(int32_t x, int32_t y, uint8_t value) {
-    for (PanelDescriptor &desc : m_panels) {
-        if (isInBounds(x, y, desc)) {
-            int32_t panelX = x - desc.x;
-            int32_t panelY = y - desc.y;
-            desc.panel->setPixelGrayscale(panelX, panelY, value);
+    PanelDescriptor *begin = m_panels, *end = m_panels + m_panelCount;
+    for (PanelDescriptor *it = begin; it < end; ++it) {
+        if (isInBounds(x, y, *it)) {
+            int32_t panelX = x - it->x;
+            int32_t panelY = y - it->y;
+            it->panel->setPixelGrayscale(panelX, panelY, value);
         }
     }
 }

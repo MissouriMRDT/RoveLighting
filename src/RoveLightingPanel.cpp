@@ -4,27 +4,37 @@ RoveLightingPanel::RoveLightingPanel(uint8_t pin, uint16_t width, uint16_t heigh
     m_pin = pin;
     m_width = width;
     m_height = height;
-    m_neoPixel = Adafruit_NeoPixel(m_width * m_height, m_pin, type);
+    m_neoPixel = new Adafruit_NeoPixel(m_width * m_height, m_pin, type);
+}
+
+RoveLightingPanel::~RoveLightingPanel() {
+    delete m_neoPixel;
 }
 
 void RoveLightingPanel::begin() {
-    m_neoPixel.begin();
-    m_neoPixel.setBrightness(m_maxBrightness);
+    if (!m_neoPixel) return;
+    configBrightness(m_brightness);
+    m_neoPixel->begin();
+    m_neoPixel->show();
 }
 
 void RoveLightingPanel::show() {
-    m_neoPixel.show();
+    if (!m_neoPixel) return;
+    m_neoPixel->show();
 }
 
 void RoveLightingPanel::fill(Color color) {
-    m_neoPixel.fill(Adafruit_NeoPixel::Color(color.r, color.g, color.b));
+    if (!m_neoPixel) return;
+    m_neoPixel->fill(Adafruit_NeoPixel::Color(color.r, color.g, color.b));
 }
 
 void RoveLightingPanel::clear() {
-    m_neoPixel.clear();
+    if (!m_neoPixel) return;
+    m_neoPixel->clear();
 }
 
 int32_t RoveLightingPanel::getPixelID(int32_t x, int32_t y) const {
+    if (!m_neoPixel) return;
     // Check if out of bounds
     if (x < 0 || x >= m_width || y < 0 || y >= m_height) return -1;
     
@@ -65,39 +75,33 @@ int32_t RoveLightingPanel::getPixelID(int32_t x, int32_t y) const {
 }
 
 void RoveLightingPanel::setPixelRGB(int32_t x, int32_t y, Color color) {
+    if (!m_neoPixel) return;
     // Skip if transparent
     if (color.transparent) return;
 
     int pixelID = getPixelID(x, y);
     if (pixelID == -1) return; // Out of bounds
 
-    m_neoPixel.setPixelColor(pixelID, color.r, color.g, color.b);
+    m_neoPixel->setPixelColor(pixelID, color.r, color.g, color.b);
 }
 
 void RoveLightingPanel::setPixelGrayscale(int32_t x, int32_t y, uint8_t value) {
+    if (!m_neoPixel) return;
     int pixelID = 256 - (8 * x) + (x % 2 == 0 ? -8 + y : -y - 1);
-    m_neoPixel.setPixelColor(pixelID, value, value, value);
+    m_neoPixel->setPixelColor(pixelID, value, value, value);
 }
 
 void RoveLightingPanel::configOrientation(LightingPanelOrientation orientation) {
     m_orientation = orientation;
 }
 
-void RoveLightingPanel::configMaxBrightness(uint8_t brightness) {
-    m_maxBrightness = brightness;
-    if (m_neoPixel.getBrightness() > m_maxBrightness) {
-        m_neoPixel.setBrightness(m_maxBrightness);
-    }
-}
-void RoveLightingPanel::setBrightness(uint8_t brightness) {
-    if (brightness <= m_maxBrightness) {
-        m_neoPixel.setBrightness(brightness);
-    } else {
-        m_neoPixel.setBrightness(m_maxBrightness);
-    }
+void RoveLightingPanel::configBrightness(uint8_t brightness) {
+    m_brightness = brightness;
+    if (!m_neoPixel) return;
+    m_neoPixel->setBrightness(m_brightness);
 }
 
-void RoveLightingPanel::registerDeadPixel(uint32_t pixelID) {
+void RoveLightingPanel::configDeadPixel(uint32_t pixelID) {
     if (m_deadPixelCount < MAX_DEAD_PIXELS) {
         m_deadPixels[m_deadPixelCount++] = pixelID;
     }

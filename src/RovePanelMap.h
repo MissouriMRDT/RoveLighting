@@ -11,6 +11,7 @@ private:
 struct PanelDescriptor {
     int32_t x, y;
     RoveLightingPanel *panel;
+    bool modified;
 };
 
 uint8_t m_panelCount = 0;
@@ -18,7 +19,10 @@ PanelDescriptor m_panels[MAX_LIGHTING_PANELS] = {0};
 
 public:
     RovePanelMap();
+    void begin();
+    void addPanel(int32_t x, int32_t y, RoveLightingPanel *panel);
 
+    void show() override;
     void fill(Color color) override;
     void clear() override;
     void setPixelRGB(int32_t x, int32_t y, Color color) override;

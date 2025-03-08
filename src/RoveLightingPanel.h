@@ -32,12 +32,12 @@ enum LightingPanelOrientation {
 
 class RoveLightingPanel : public RoveCanvas {
 private:
-    Adafruit_NeoPixel m_neoPixel;
+    Adafruit_NeoPixel *m_neoPixel = nullptr;
 
     uint8_t m_pin;
     uint16_t m_width, m_height;
 
-    uint8_t m_maxBrightness = 70;
+    uint8_t m_brightness = 70;
 
     uint8_t m_deadPixelCount = 0;
     uint32_t m_deadPixels[MAX_DEAD_PIXELS] = {0};
@@ -53,26 +53,28 @@ public:
      * @param height The height of the panel in pixels
      */
     RoveLightingPanel(uint8_t pin, uint16_t width, uint16_t height, neoPixelType type = NEO_GRB + NEO_KHZ800);
+    ~RoveLightingPanel();
 
     void begin();
-    void show();
 
     int32_t getPixelID(int32_t x, int32_t y) const;
 
+    void show() override;
     void fill(Color color) override;
     void clear() override;
     void setPixelRGB(int32_t x, int32_t y, Color color) override;
     void setPixelGrayscale(int32_t x, int32_t y, uint8_t value) override;
 
     void configOrientation(LightingPanelOrientation orientation);
-    void configMaxBrightness(uint8_t brightness);
-    void setBrightness(uint8_t brightness);
-    void registerDeadPixel(uint32_t pixelID);
+    void configBrightness(uint8_t brightness);
+    void configDeadPixel(uint32_t pixelID);
 
-    const Adafruit_NeoPixel &getNeoPixel() const { return m_neoPixel; }
+    void setNeoPixel(Adafruit_NeoPixel *neoPixel) { m_neoPixel = neoPixel; }
+    const Adafruit_NeoPixel &getNeoPixel() const { return *m_neoPixel; }
     uint16_t getWidth() const { return m_width; }
     uint16_t getHeight() const { return m_height; }
-    uint8_t getMaxBrightness() const { return m_maxBrightness; }
+    uint8_t getBrightness() const { return m_brightness; }
+
 };
 
 #endif // ROVELIGHTINGPANEL_H

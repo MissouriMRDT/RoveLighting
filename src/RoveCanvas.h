@@ -7,6 +7,7 @@
 
 class RoveCanvas {
 public:
+    virtual void show() = 0;
     virtual void fill(Color color) = 0;
     virtual void clear() = 0;
     virtual void setPixelRGB(int32_t x, int32_t y, Color color) = 0;
