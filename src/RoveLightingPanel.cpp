@@ -1,10 +1,15 @@
 #include "RoveLightingPanel.h"
 
 RoveLightingPanel::RoveLightingPanel(uint8_t pin, uint16_t width, uint16_t height, neoPixelType type) {
-    m_pin = pin;
     m_width = width;
     m_height = height;
-    m_neoPixel = new Adafruit_NeoPixel(m_width * m_height, m_pin, type);
+    m_neoPixel = new Adafruit_NeoPixel(m_width * m_height, pin, type);
+}
+
+RoveLightingPanel::RoveLightingPanel(Adafruit_NeoPixel *neoPixel, uint16_t width, uint16_t height) {
+    m_neoPixel = neoPixel;
+    m_width = width;
+    m_height = height;
 }
 
 RoveLightingPanel::~RoveLightingPanel() {
@@ -105,4 +110,11 @@ void RoveLightingPanel::configDeadPixel(uint32_t pixelID) {
     if (m_deadPixelCount < MAX_DEAD_PIXELS) {
         m_deadPixels[m_deadPixelCount++] = pixelID;
     }
+}
+
+void RoveLightingPanel::setNeoPixel(Adafruit_NeoPixel *neoPixel) {
+    if (m_neoPixel) {
+        delete m_neoPixel;
+    }
+    m_neoPixel = neoPixel;
 }

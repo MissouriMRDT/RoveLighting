@@ -13,14 +13,18 @@ void RovePanelMap::begin() {
     }
 }
 
-void RovePanelMap::addPanel(int32_t x, int32_t y, RoveLightingPanel *panel) {
-    if (m_panelCount < MAX_LIGHTING_PANELS) {
-        PanelDescriptor &desc = m_panels[m_panelCount++];
-        desc.x = x;
-        desc.y = y;
-        desc.panel = panel;
-        desc.modified = true;
-    }
+void RovePanelMap::addPanel(RoveLightingPanel *panel, int32_t x, int32_t y) {
+    if (m_panelCount >= MAX_LIGHTING_PANELS) return;
+    PanelDescriptor &desc = m_panels[m_panelCount++];
+    desc.panel = panel;
+    desc.x = x;
+    desc.y = y;
+    desc.modified = true;
+
+    if (x < m_left) m_left = x;
+    if (y < m_top) m_top = y;
+    if (x + panel->getWidth() > m_right) m_right = x + panel->getWidth();
+    if (y + panel->getHeight() > m_bottom) m_bottom = y + panel->getHeight();
 }
 
 void RovePanelMap::show() {

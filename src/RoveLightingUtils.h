@@ -17,4 +17,17 @@ const Color BLUE = {0, 0, 255};
 const Color MAGENTA = {255, 0, 255};
 const Color CLEAR = {0, 0, 0, true};
 
+enum class FrameType {
+    COLOR, IMAGE,
+};
+enum class ColorFormat {
+    GRAYSCALE, RGB,
+};
+
+struct Image {
+    uint32_t width, height;
+    ColorFormat colorFormat;
+    const uint8_t *dataPtr;
+};
+
 #endif // ROVELIGHTINGUTILS_H

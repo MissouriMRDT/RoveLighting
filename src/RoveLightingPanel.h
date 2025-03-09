@@ -45,14 +45,9 @@ private:
     LightingPanelOrientation m_orientation = LightingPanelOrientation::TOP_LEFT_THEN_RIGHT;
 
 public:
-    /**
-     * @brief Construct a new Rove Lighting Panel object
-     * 
-     * @param pin The pin the signal wire of the panel is connected to
-     * @param width The width of the panel in pixels
-     * @param height The height of the panel in pixels
-     */
     RoveLightingPanel(uint8_t pin, uint16_t width, uint16_t height, neoPixelType type = NEO_GRB + NEO_KHZ800);
+    RoveLightingPanel(Adafruit_NeoPixel *neoPixel, uint16_t width, uint16_t height);
+    RoveLightingPanel(const RoveLightingPanel &other) = delete;
     ~RoveLightingPanel();
 
     void begin();
@@ -69,7 +64,7 @@ public:
     void configBrightness(uint8_t brightness);
     void configDeadPixel(uint32_t pixelID);
 
-    void setNeoPixel(Adafruit_NeoPixel *neoPixel) { m_neoPixel = neoPixel; }
+    void setNeoPixel(Adafruit_NeoPixel *neoPixel);
     const Adafruit_NeoPixel &getNeoPixel() const { return *m_neoPixel; }
     uint16_t getWidth() const { return m_width; }
     uint16_t getHeight() const { return m_height; }

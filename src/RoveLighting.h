@@ -4,5 +4,6 @@
 #include "RoveLightingUtils.h"
 #include "RoveLightingPanel.h"
 #include "RovePanelMap.h"
+#include "RovePainter.h"
 
 #endif // ROVELIGHTING_H
