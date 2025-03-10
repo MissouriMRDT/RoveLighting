@@ -42,7 +42,7 @@ private:
     uint8_t m_deadPixelCount = 0;
     uint32_t m_deadPixels[MAX_DEAD_PIXELS] = {0};
 
-    LightingPanelOrientation m_orientation = LightingPanelOrientation::TOP_LEFT_THEN_RIGHT;
+    LightingPanelOrientation m_orientation = LightingPanelOrientation::TOP_RIGHT_THEN_LEFT;
 
 public:
     RoveLightingPanel(uint8_t pin, uint16_t width, uint16_t height, neoPixelType type = NEO_GRB + NEO_KHZ800);
@@ -57,7 +57,9 @@ public:
     void show() override;
     void fill(Color color) override;
     void clear() override;
-    void setPixelRGB(int32_t x, int32_t y, Color color) override;
+    void setPixelColor(int32_t x, int32_t y, Color color) override;
+    void setPixelRGB(int32_t x, int32_t y, uint8_t r, uint8_t g, uint8_t b) override;
+    void setPixelRGBA(int32_t x, int32_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
     void setPixelGrayscale(int32_t x, int32_t y, uint8_t value) override;
 
     void configOrientation(LightingPanelOrientation orientation);

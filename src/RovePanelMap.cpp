@@ -54,13 +54,35 @@ void RovePanelMap::clear() {
     }
 }
 
-void RovePanelMap::setPixelRGB(int32_t x, int32_t y, Color color) {
+void RovePanelMap::setPixelColor(int32_t x, int32_t y, Color color) {
     PanelDescriptor *begin = m_panels, *end = m_panels + m_panelCount;
     for (PanelDescriptor *it = begin; it < end; ++it) {
         if (isInBounds(x, y, *it)) {
             int32_t panelX = x - it->x;
             int32_t panelY = y - it->y;
-            it->panel->setPixelRGB(panelX, panelY, color);
+            it->panel->setPixelColor(panelX, panelY, color);
+        }
+    }
+}
+
+void RovePanelMap::setPixelRGB(int32_t x, int32_t y, uint8_t r, uint8_t g, uint8_t b) {
+    PanelDescriptor *begin = m_panels, *end = m_panels + m_panelCount;
+    for (PanelDescriptor *it = begin; it < end; ++it) {
+        if (isInBounds(x, y, *it)) {
+            int32_t panelX = x - it->x;
+            int32_t panelY = y - it->y;
+            it->panel->setPixelRGB(panelX, panelY, r, g, b);
+        }
+    }
+}
+
+void RovePanelMap::setPixelRGBA(int32_t x, int32_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    PanelDescriptor *begin = m_panels, *end = m_panels + m_panelCount;
+    for (PanelDescriptor *it = begin; it < end; ++it) {
+        if (isInBounds(x, y, *it)) {
+            int32_t panelX = x - it->x;
+            int32_t panelY = y - it->y;
+            it->panel->setPixelRGBA(panelX, panelY, r, g, b, a);
         }
     }
 }

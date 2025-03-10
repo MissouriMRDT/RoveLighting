@@ -29,7 +29,9 @@ public:
     void show() override;
     void fill(Color color) override;
     void clear() override;
-    void setPixelRGB(int32_t x, int32_t y, Color color) override;
+    void setPixelColor(int32_t x, int32_t y, Color color) override;
+    void setPixelRGB(int32_t x, int32_t y, uint8_t r, uint8_t g, uint8_t b) override;
+    void setPixelRGBA(int32_t x, int32_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
     void setPixelGrayscale(int32_t x, int32_t y, uint8_t value) override;
 
     uint32_t getWidth() const { return m_right - m_left; }

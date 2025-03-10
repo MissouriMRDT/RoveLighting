@@ -39,7 +39,7 @@ void RoveLightingPanel::clear() {
 }
 
 int32_t RoveLightingPanel::getPixelID(int32_t x, int32_t y) const {
-    if (!m_neoPixel) return;
+    if (!m_neoPixel) return -1;
     // Check if out of bounds
     if (x < 0 || x >= m_width || y < 0 || y >= m_height) return -1;
     
@@ -72,22 +72,29 @@ int32_t RoveLightingPanel::getPixelID(int32_t x, int32_t y) const {
 
     // Correct for skipping over dead pixels
     for (int i = 0; i < m_deadPixelCount; i++) {
-        if (m_deadPixels[i] == pixelID) return -1; // Do not attempt to set this pixel
-        if (m_deadPixels[i] < pixelID) --pixelID; // Pixel will be reached earlier than expected
+        if (m_deadPixels[i] == (uint32_t)pixelID) return -1; // Do not attempt to set this pixel
+        if (m_deadPixels[i] < (uint32_t)pixelID) --pixelID; // Pixel will be reached earlier than expected
     }
 
     return pixelID;
 }
 
-void RoveLightingPanel::setPixelRGB(int32_t x, int32_t y, Color color) {
-    if (!m_neoPixel) return;
-    // Skip if transparent
-    if (color.transparent) return;
+void RoveLightingPanel::setPixelColor(int32_t x, int32_t y, Color color) {
+    setPixelRGBA(x, y, color.r, color.g, color.b, color.transparent ? 0 : 255);
+}
 
-    int pixelID = getPixelID(x, y);
+void RoveLightingPanel::setPixelRGB(int32_t x, int32_t y, uint8_t r, uint8_t g, uint8_t b) {
+    if (!m_neoPixel) return;
+
+    int32_t pixelID = getPixelID(x, y);
     if (pixelID == -1) return; // Out of bounds
 
-    m_neoPixel->setPixelColor(pixelID, color.r, color.g, color.b);
+    m_neoPixel->setPixelColor(pixelID, r, g, b);
+}
+
+void RoveLightingPanel::setPixelRGBA(int32_t x, int32_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (a == 0) return; // Skip transparent pixels
+    setPixelRGB(x, y, r, g, b);
 }
 
 void RoveLightingPanel::setPixelGrayscale(int32_t x, int32_t y, uint8_t value) {
